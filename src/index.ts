@@ -1,19 +1,21 @@
+import crypto from 'crypto'
 import Block from "./Block"
 import BlockChain from "./BlockChain"
-import crypto, { randomBytes } from 'crypto'
+import Transacion from './Transaction'
+import Wallet from "./Wallet"
 
+// init blockChain
 let blockChain = new BlockChain()
+// tem block letter will be mined automaticaly
 let block = new Block()
+// fack new wallet
+let wallet = new Wallet()
 // block.calculatHash()
-console.log(block.blockHash + '-' + block.nonce);
 
-// genarating wallets
-var prime_length = 512;
-var diffHell = crypto.createDiffieHellman(prime_length);
+console.log("public key",wallet.publicKey_);
+console.log("private key",wallet.privateKey_);
 
-diffHell.generateKeys('base64');
-console.log("Public Key : " ,diffHell.getPublicKey('base64'));
-console.log("Private Key : " ,diffHell.getPrivateKey('base64'));
+// making a transaction
+let trans = new Transacion(wallet.publicKey_,20)
 
-console.log("Public Key : " ,diffHell.getPublicKey('hex'));
-console.log("Private Key : " ,diffHell.getPrivateKey('hex'));
+console.log(wallet.signTransaction(trans));
