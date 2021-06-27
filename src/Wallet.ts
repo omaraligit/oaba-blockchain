@@ -6,11 +6,11 @@ export default class Wallet {
 
 
     // genarating wallets
-    publicKey_: string = ''
-    privateKey_: string = ''
+    publicKey_: Buffer
+    privateKey_: Buffer
 
     constructor() {
-        crypto.generateKeyPair('ec', {
+        var {publicKey, privateKey} = crypto.generateKeyPairSync('ec', {
             namedCurve: 'secp256k1',   // Options
             publicKeyEncoding: {
                 type: 'spki',
@@ -20,45 +20,18 @@ export default class Wallet {
                 type: 'pkcs8',
                 format: 'der'
             }
-        }, (err, publicKey, privateKey) => this.handleCallBack(err, publicKey, privateKey));
-
+        });
+        this.publicKey_ = publicKey
+        this.privateKey_ = privateKey
     }
-    handleCallBack(err: Error | null, publicKey: Buffer, privateKey: Buffer) {
-        if (!err) {
-            // Prints new asymmetric key
-            // pair after encoding
-            this.publicKey_ = publicKey.toString('hex')
-            this.privateKey_ = privateKey.toString('hex')
-
-            console.log(this.publicKey_,this.privateKey_)
-
-        }
-        else {
-            // Prints error
-            console.log("Errr is: ", err);
-        }
 
 
-    }
+
     signTransaction(transaction: Transacion): any {
-        return 'signature'
-
-        // const sign = crypto.createSign('SHA256');
-        // sign.write('some data to sign');
-        // sign.end();
-        // const signature = sign.sign(privateKey, 'hex');
-
-            
-
-
+        const sign = crypto.createSign('SHA256');
+        sign.write(transaction.dataToText())
+        sign.end();
+        transaction.signature = sign.sign({ key: this.privateKey_, format: 'der', type: 'pkcs8' });
     }
 
-    verifyTransaction(transaction: Transacion): any {
-        return 'signature'
-
-        // const verify = crypto.createVerify('SHA256');
-        // verify.write('some data to sign');
-        // verify.end();
-        // console.log(verify.verify(publicKey, signature, 'hex'));
-    }
 }

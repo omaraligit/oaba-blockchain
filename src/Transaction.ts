@@ -1,15 +1,30 @@
-import Wallet from "./Wallet"
+import crypto from 'crypto'
 
-export default class Transacion{
+export default class Transacion {
 
-    fromAddress: string = ''
-    toAddress:string = ''
+    fromAddress: Buffer = Buffer.from('')
+    toAddress: Buffer = Buffer.from('')
     amount: number = 0
-    signature: string = ''
-    wallet: Wallet = new Wallet()
-    constructor(toAddress: string,amount: number){
-        this.wallet = new Wallet()
-        this.signature = this.wallet.signTransaction(this)
+    signature: Buffer = Buffer.from('')
+    constructor(fromAddress: Buffer, toAddress: Buffer, amount: number) {
+
+        this.fromAddress = fromAddress
+        this.toAddress = toAddress
+        this.amount =amount
+
+    }
+
+    
+    verifyTransaction(): any {
+        const verify = crypto.createVerify('SHA256');
+        verify.write(this.dataToText())
+        verify.end();
+        return verify.verify({key: this.fromAddress, format:'der', type: 'spki'},this.signature);
+    }
+
+
+    dataToText(): any {
+        return this.fromAddress.toString('hex') + this.toAddress.toString('hex') + this.amount
     }
 
 }
